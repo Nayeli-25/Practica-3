@@ -31,16 +31,23 @@ class ComentariosController extends Controller
         ->pluck('productos.Producto')->first();
         Log::info('producto '.$producto);
 
-        $usuario=DB::table('comentarios')
+        $email=DB::table('comentarios')
         ->join('productos','comentarios.producto_id','=','productos.id')
         ->join('usuarios','productos.Publicado_por','=','usuarios.id')
         ->where('productos.id','=', $request -> producto_id)
         ->pluck('usuarios.email')->first();
-        Log::info('Usuario'.$usuario);
+        Log::info('Usuario'.$email);
+
+        $nombre=DB::table('comentarios')
+        ->join('productos','comentarios.producto_id','=','productos.id')
+        ->join('usuarios','productos.Publicado_por','=','usuarios.id')
+        ->where('productos.id','=', $request -> producto_id)
+        ->pluck('usuarios.Nombre')->first();
+        Log::info('Nombre'.$nombre);
         
         if ($comentario->save()){
             app(ApiMailController::class)->MailAddCommentary($producto);
-            app(ApiMailController::class)->MailReceiveCommentary($usuario, $producto);
+            app(ApiMailController::class)->MailReceiveCommentary($email, $nombre, $producto);
             return response()->json(["Nuevo comentario"=>$comentario],201);
         }
         return response()->json(null,400);

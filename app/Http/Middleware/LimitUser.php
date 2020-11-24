@@ -19,7 +19,7 @@ class LimitUser
     {   
         if (auth()->check() && auth()->user()->Rol==2)
         {
-            if (auth()->user()->id==$request->id)
+            if (auth()->user()->id==$request->id) 
                 return $next($request);
             
             else {

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Fecades\Storage;
 use App\Models\User;
+use App\Http\Controllers\ApiMail\ApiMailController;
 use Illuminate\Support\Facades\Log;
 
 class FilesController extends Controller
@@ -28,11 +29,31 @@ class FilesController extends Controller
             
             $file = auth()->user();
             $file->imagen = $nombre;
-            $file->save();
             
-            return response()->json(["SubidaPrivada"=>$path],201);
+            if($file->save()){
+                app(ApiMailController::class)->MailActualizacionPerfil();
+                return response()->json(["SubidaPrivada "=>$path],201);
+            }
         }
         return response()->json(['No se ha añadido ningún archivo'], 456); 
+    }
+
+    public function deleteImagen(){
+
+        $id=auth()->user()->id;
+        $usuario=User::find($id);
+
+        if($usuario->imagen <> null) 
+        {
+            $usuario->imagen = null;
+        
+            if($usuario->save()) {
+                app(ApiMailController::class)->MailActualizacionPerfil();
+                return response()->json("Imagen eliminada correctamente",200);
+            }
+            return response()->json("No se eliminó tu imagen",400);
+        }
+        return response()->json(['No cuentas con alguna imagen en tu perfil'], 400); 
     }
     
 

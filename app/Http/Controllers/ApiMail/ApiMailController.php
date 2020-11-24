@@ -45,6 +45,40 @@ class ApiMailController extends Controller
         return response()->json(["Información" => $response->getData()],500);
     }
 
+    public function MailActualizacionPerfil() {
+
+        $apikey = config('app.mjapikeypub');
+        $apisecret = config('app.mjapikeypriv');
+
+        $nombre=auth()->user()->Nombre;
+        $email=auth()->user()->email;
+
+        $mj = new \Mailjet\Client($apikey,$apisecret,true,['version' => 'v3.1']);
+        $body = [
+            'Messages' => [
+            [
+                'From' => [
+                'Email' => "19170139@uttcampus.edu.mx",
+                'Name' => "Nayeli Esquivel"
+                ],
+                'To' => [
+                [
+                    'Email' => $email,
+                    'Name' => $nombre
+                ]
+                ],
+                'Subject' => "Actualización de perfil",
+                'TextPart' => "¡Felicidades!",
+                'HTMLPart' => "<h3> ¡Se actualizó tu perfil de manera exitosa! </h3>",
+                'CustomID' => "AppGettingStartedTest"
+            ]
+            ]
+        ];
+        $response = $mj->post(Resources::$Email, ['body' => $body]);
+        if($response->success())
+            return response()->json(["Datos" => $response->getData()],200);
+        return response()->json(["Datos" => $response->getData()],500);
+    }
 
     public function MailAccionDenegada($action) {
 
@@ -65,7 +99,7 @@ class ApiMailController extends Controller
                 ],
                 'To' => [
                 [
-                    'Email' => "19170139@utt.edu.mx",
+                    'Email' => "19170139@utt.edu.mx", //admin
                     'Name' => "Nayeli Esquivel"
                 ]
                 ],
@@ -119,10 +153,13 @@ class ApiMailController extends Controller
     }
 
 
-    public function MailReceiveCommentary($usuario, $producto) {
+    public function MailReceiveCommentary($email, $nombre, $producto) {
 
         $apikey = config('app.mjapikeypub');
         $apisecret = config('app.mjapikeypriv');
+
+        $nombreComentador=auth()->user()->Nombre;
+        $apellidoComentador=auth()->user()->Apellido;
 
         $mj = new \Mailjet\Client($apikey,$apisecret,true,['version' => 'v3.1']);
         $body = [
@@ -134,13 +171,13 @@ class ApiMailController extends Controller
                 ],
                 'To' => [
                 [
-                    'Email' => $usuario,
-                    'Name' => "n"
+                    'Email' => $email,
+                    'Name' => $nombre
                 ]
                 ],
-                'Subject' => "Nuevo comentario añadido",
+                'Subject' => "Nuevo comentario recibido",
                 'TextPart' => "Nuevo cometario",
-                'HTMLPart' => "<h3> Se ha realzado un nuevo comentario a tu producto '{$producto}'. </h3>",
+                'HTMLPart' => "<h3> {$nombreComentador} {$apellidoComentador} ha realizado un nuevo comentario a tu producto '{$producto}'. </h3>",
                 'CustomID' => "AppGettingStartedTest"
             ]
             ]

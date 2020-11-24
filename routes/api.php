@@ -40,8 +40,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('usuarios/{id?}', 'UsersController@getUsuarios')->middleware('checkrole')->where("id", "[0-9]+");
     Route::put('updateUsuario/{id}', 'UsersController@updateUsuario')->middleware('limituser');
     Route::delete('deleteUsuario/{id}', 'UsersController@deleteUsuario')->middleware('limituser');
-    //Subir imagen de perfil
+    //Imagen de perfil
     Route::post('subirImagen', 'Files\FilesController@SubirImagenPerfil');
+    Route::delete('deleteImagen', 'Files\FilesController@deleteImagen');
     });
     
 //Rutas Productos
